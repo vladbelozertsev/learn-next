@@ -3,4 +3,4 @@ import { atom } from "jotai";
 
 export const userAtom = atom<UserAPI | undefined | null>(undefined);
 export const isAuthAtom = atom<boolean>((get) => !!get(userAtom));
-export const apiKeyAtom = atom<string>("");
+export const tokenAtom = atom<string>("");
