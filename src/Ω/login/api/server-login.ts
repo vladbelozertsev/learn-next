@@ -1,8 +1,8 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { UserAPI } from "@/libs/types/user-api";
 import type { LoginInput } from ".";
+import { UserAPI } from "@/libs/types/user-api";
+import { cookies } from "next/headers";
 
 export type ServerResponse = {
   user: UserAPI;
@@ -22,8 +22,8 @@ export const serverLogin = async (input: LoginInput) => {
   if (res.ok) {
     const data = (await res.json()) as ServerResponse;
     const cookieStore = await cookies();
-    const token = { name: "token", value: data.refreshToken };
-    cookieStore.set({ ...token, httpOnly: true });
+    cookieStore.set({ name: "accessToken", value: data.accessToken, httpOnly: true });
+    cookieStore.set({ name: "refreshToken", value: data.refreshToken, httpOnly: true });
     return { user: data.user, accessToken: data.accessToken };
   }
 

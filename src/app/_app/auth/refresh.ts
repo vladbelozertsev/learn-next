@@ -9,7 +9,7 @@ export const refresh = async (refreshTokenJwt?: string) => {
 
   const headers = new Headers();
   headers.append("Authorization", `Bearer ${refreshTokenJwt}`);
-  const res = await fetch("http://localhost:3000/api/refresh", {
+  const res = await fetch("http://localhost:3000/api/auth/refresh", {
     method: "POST",
     headers,
   });

@@ -13,10 +13,11 @@ export default function App() {
 
   useQuery({
     queryKey: ["APP_AUTH_FLOW"],
+    enabled: !user,
     queryFn: async () => {
       const res = await auth();
-      setToken(res.accessToken);
-      setUser(res.user);
+      setToken(res?.accessToken || "");
+      setUser(res?.user || null);
       return res;
     },
   });

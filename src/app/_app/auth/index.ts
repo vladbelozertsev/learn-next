@@ -12,20 +12,20 @@ export const auth = async () => {
   if (!accessTokenJwt) return clear(cookieStore);
 
   const accessTokenDecoded = jwtDecode(accessTokenJwt);
-  const nowPlus29 = Math.round(Date.now()) / 1000 + 29;
   if (!accessTokenDecoded.exp) return clear(cookieStore);
+  const now = Math.round(Date.now()) / 1000;
 
-  if (accessTokenDecoded.exp > nowPlus29) {
-    const user = await getUser(accessTokenJwt);
+  if (accessTokenDecoded.exp - 29 < now) {
+    const refreshed = await refresh(cookieStore.get("refreshToken")?.value);
+    if (!refreshed) return clear(cookieStore);
+    const user = await getUser(refreshed.accessToken);
     if (!user) return clear(cookieStore);
-    return { user, accessToken: accessTokenJwt };
+    cookieStore.set("accessToken", refreshed.accessToken);
+    cookieStore.set("refreshToken", refreshed.refreshToken);
+    return { user, accessToken: refreshed.accessToken };
   }
 
-  const refreshed = await refresh(cookieStore.get("refreshToken")?.value);
-  if (!refreshed) return clear(cookieStore);
-  const user = await getUser(refreshed.accessToken);
+  const user = await getUser(accessTokenJwt);
   if (!user) return clear(cookieStore);
-  cookieStore.set("accessToken", refreshed.accessToken);
-  cookieStore.set("refreshToken", refreshed.refreshToken);
-  return { user, accessToken: refreshed.accessToken };
+  return { user, accessToken: accessTokenJwt };
 };
