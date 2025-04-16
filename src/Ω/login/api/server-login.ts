@@ -22,8 +22,11 @@ export const serverLogin = async (input: LoginInput) => {
   if (res.ok) {
     const data = (await res.json()) as ServerResponse;
     const cookieStore = await cookies();
-    cookieStore.set({ name: "accessToken", value: data.accessToken, httpOnly: true });
-    cookieStore.set({ name: "refreshToken", value: data.refreshToken, httpOnly: true });
+    cookieStore.set({
+      name: "refreshToken",
+      value: data.refreshToken,
+      httpOnly: true,
+    });
     return { user: data.user, accessToken: data.accessToken };
   }
 

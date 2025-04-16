@@ -4,9 +4,9 @@ import { FC } from "react";
 import { Input } from "@/libs/components/input";
 import { className } from "@/libs/helpers";
 import { useForm } from "react-hook-form";
-import { useLogin } from "./api";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { useLogin, useLoginGoogle } from "./api";
 import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 const schema = z.object({
   email: z.string().email({ message: "Please, enter email" }),
@@ -15,11 +15,12 @@ const schema = z.object({
 
 export const Login: FC = () => {
   const form = useForm({ resolver: zodResolver(schema) });
+  const loginGoogle = useLoginGoogle();
   const login = useLogin();
 
   const signin = form.handleSubmit(
-    (data) => {
-      login.mutate(data);
+    () => {
+      loginGoogle.mutate();
     },
     (err) => {
       console.error(err);

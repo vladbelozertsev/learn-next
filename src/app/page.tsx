@@ -1,28 +1,21 @@
 "use client";
 
 import { Home } from "@/Ω/home";
-import { Login } from "@/Ω/login";
-import { auth } from "./_app/auth";
-import { tokenAtom, userAtom } from "@/libs/state/auth";
+import { isAuthAtom, isUserLoadingAtom } from "@/libs/state/auth";
 import { useAtom } from "jotai";
-import { useQuery } from "@tanstack/react-query";
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export default function App() {
-  const [user, setUser] = useAtom(userAtom);
-  const setToken = useAtom(tokenAtom)[1];
+  const isLoading = useAtom(isUserLoadingAtom)[0];
+  const isAuth = useAtom(isAuthAtom)[0];
+  const router = useRouter();
 
-  useQuery({
-    queryKey: ["APP_AUTH_FLOW"],
-    enabled: !user,
-    queryFn: async () => {
-      const res = await auth();
-      setToken(res?.accessToken || "");
-      setUser(res?.user || null);
-      return res;
-    },
-  });
+  useEffect(() => {
+    if (isLoading || isAuth) return;
+    router.push("http://localhost:3001/login");
+  }, [isLoading, isAuth, router]);
 
-  if (user === undefined) return "...Loading";
-  if (user === null) return <Login />;
-  if (user) return <Home />;
+  if (isLoading) return "...Loading";
+  return <Home />;
 }
