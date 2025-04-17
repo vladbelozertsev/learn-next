@@ -1,10 +1,11 @@
 "use client";
 
 import { FC, Fragment, useEffect } from "react";
-import { auth } from "./utils";
+import { UserAPI } from "@/libs/types/user-api";
+import { jwtDecode } from "jwt-decode";
 import { tokenAtom, userAtom } from "@/libs/state/auth";
 import { useAtom } from "jotai";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
 type Props = {
   children: React.ReactNode;
@@ -15,16 +16,36 @@ export const Auth: FC<Props> = ({ children }) => {
   const setToken = useAtom(tokenAtom)[1];
   const qc = useQueryClient();
 
-  useQuery({
-    queryKey: ["APP_AUTH_FLOW"],
-    enabled: user === undefined,
-    queryFn: async () => {
-      const res = await auth();
-      setToken(res?.accessToken || "");
-      setUser(res?.user || null);
-      return res;
-    },
-  });
+  useEffect(() => {
+    const setNoAuth = () => {
+      setUser(null);
+      setToken(null);
+    };
+
+    try {
+      (async function () {
+        const credentials = "include";
+        const headers = new Headers();
+        const tokenRes = await fetch("http://localhost:3000/api/auth/refresh/web", { credentials });
+        if (!tokenRes.ok) return setNoAuth();
+
+        const tokenResJson = (await tokenRes.json()) as { accessToken: string };
+        headers.append("Authorization", `Bearer ${tokenResJson.accessToken}`);
+        const userRes = await fetch("http://localhost:3000/api/users", { headers, credentials });
+        if (!userRes.ok) return setNoAuth();
+
+        const exp = jwtDecode(tokenResJson.accessToken).exp!;
+        console.log(exp);
+        const userResJson = (await userRes.json()) as { user: UserAPI };
+        await userRes.json().then(setUser);
+        setToken({ jwt: tokenResJson.accessToken, exp });
+        setUser(userResJson.user);
+      })();
+    } catch (err) {
+      console.error(err);
+      setNoAuth();
+    }
+  }, [setUser, setToken]);
 
   useEffect(() => {
     if (user === null) qc.removeQueries();

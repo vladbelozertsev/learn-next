@@ -8,16 +8,16 @@ import { refresh } from "./refresh";
 const refreshTokenCookieName = "refresh_token";
 
 const clear = (cookieStore: ReadonlyRequestCookies) => {
-  cookieStore.delete(refreshTokenCookieName);
+  // cookieStore.delete(refreshTokenCookieName);
   return { user: null, accessToken: "" };
 };
 
 export const auth = async () => {
   const cookieStore = await cookies();
 
-  const refreshed = await refresh(
-    cookieStore.get(refreshTokenCookieName)?.value
-  );
+  const refreshed = await refresh(cookieStore.get(refreshTokenCookieName)?.value);
+
+  console.log("first", refreshed);
   if (!refreshed) return clear(cookieStore);
 
   const user = await getUser(refreshed.accessToken);

@@ -26,7 +26,7 @@ export const useLogin = () => {
     mutationFn: async (input: LoginInput) => {
       const result = await serverLogin(input);
       if (result?.user) setUser(result.user);
-      if (result?.accessToken) setToken(result.accessToken);
+      if (result?.accessToken) setToken({ jwt: result.accessToken, exp: 1111 });
       return result;
     },
   });

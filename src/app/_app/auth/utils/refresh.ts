@@ -3,9 +3,9 @@ import { jwtDecode } from "jwt-decode";
 export const refresh = async (refreshTokenJwt?: string) => {
   if (!refreshTokenJwt) return;
 
-  const refreshTokenDecoded = jwtDecode(refreshTokenJwt);
-  const now = Math.round(Date.now()) / 1000;
-  if ((refreshTokenDecoded?.exp || 0) < now) return;
+  // const refreshTokenDecoded = jwtDecode(refreshTokenJwt);
+  // const now = Math.round(Date.now()) / 1000;
+  // if ((refreshTokenDecoded?.exp || 0) < now) return;
 
   const headers = new Headers();
   headers.append("Authorization", `Bearer ${refreshTokenJwt}`);
