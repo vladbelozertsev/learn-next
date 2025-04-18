@@ -1,3 +1,4 @@
+import { jwtDecode } from "jwt-decode";
 import { tokenAtom } from "../state/auth";
 import { useAtom } from "jotai";
 import { useCallback } from "react";
@@ -14,7 +15,7 @@ export const useAuthFetch = () => {
         }
 
         return res.text().then((err?: unknown) => {
-          const isErrMsg = typeof err === "string";
+          const isErrMsg = typeof err === "string" && err !== "";
           const msg = isErrMsg ? err : "Internal server error";
           return { res, json: null, err: msg };
         });
@@ -26,10 +27,23 @@ export const useAuthFetch = () => {
         return res.json as { accessToken: string };
       };
 
-      if (token && token.exp - 30 < Math.round(Date.now() / 1000)) {
-        const { accessToken } = await refreshToken();
-        const headers = { Authorization: `Bearer ${accessToken}`, ...init?.headers };
-        const res = await fetch(input, { ...init, headers });
+      const fetchWithRefresh = async () => {
+        const refreshedToken = await refreshToken();
+        const exp = jwtDecode(refreshedToken.accessToken).exp;
+        if (!exp) throw new Error("No token exp (auth fetch)");
+        const headers = { Authorization: `Bearer ${refreshedToken.accessToken}`, ...init?.headers };
+        const res = await fetch(input, { ...init, headers }).then(handleRes);
+        if (res.err) throw new Error(res.err);
+        setToken({ jwt: refreshedToken.accessToken, exp });
+        return { json: res.json as T1, res: res.res };
+      };
+
+      if (token && token.exp - 30 < Math.round(Date.now() / 1000)) return fetchWithRefresh();
+      else {
+        const headers = token ? { Authorization: `Bearer ${token.jwt}`, ...init?.headers } : init?.headers;
+        const res = await fetch(input, { ...init, headers }).then(handleRes);
+        if (res.err === "JwtTokenExpired") return fetchWithRefresh();
+        return { json: res.json as T1, res: res.res };
       }
     },
     [token, setToken]

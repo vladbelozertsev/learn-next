@@ -25,21 +25,19 @@ export const Auth: FC<Props> = ({ children }) => {
     try {
       (async function () {
         const credentials = "include";
-        const headers = new Headers();
         const tokenRes = await fetch("http://localhost:3000/api/auth/refresh/web", { credentials });
         if (!tokenRes.ok) return setNoAuth();
 
+        const headers = new Headers();
         const tokenResJson = (await tokenRes.json()) as { accessToken: string };
         headers.append("Authorization", `Bearer ${tokenResJson.accessToken}`);
         const userRes = await fetch("http://localhost:3000/api/users", { headers, credentials });
         if (!userRes.ok) return setNoAuth();
 
-        const exp = jwtDecode(tokenResJson.accessToken).exp!;
-        console.log(exp);
-        const userResJson = (await userRes.json()) as { user: UserAPI };
+        const exp = jwtDecode(tokenResJson.accessToken).exp;
+        if (!exp) throw new Error("No token exp (auth init)");
         await userRes.json().then(setUser);
         setToken({ jwt: tokenResJson.accessToken, exp });
-        setUser(userResJson.user);
       })();
     } catch (err) {
       console.error(err);
