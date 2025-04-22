@@ -3,7 +3,7 @@
 import jsonServerProvider from "ra-data-json-server";
 import simpleRestProvider from "ra-data-simple-rest";
 import { Admin, EditGuesser, ListGuesser, Resource } from "react-admin";
-import { useDataProvider } from "../_utils/use-data-provider";
+import { useDataProvider } from "./hooks/use-data-provider";
 
 // const dataProvider = jsonServerProvider("https://jsonplaceholder.typicode.com");
 
