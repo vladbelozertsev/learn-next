@@ -3,10 +3,9 @@
 import { DataProvider } from "react-admin";
 import { btoaURL } from "@/libs/utils";
 import { useAuthFetch } from "@/libs/hooks/use-auth-fetch";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 
 export const useDataProvider = (): DataProvider => {
-  const [asd, setAsd] = useState(0);
   const authFetch = useAuthFetch();
 
   return useMemo(
@@ -14,41 +13,43 @@ export const useDataProvider = (): DataProvider => {
       getList: async (resource, params) => {
         const { field, order } = params.sort || {};
 
-        const res = await authFetch(`
+        const res = await authFetch<any>(`
           http://localhost:3000/api/${resource}?
           limit=${params.pagination?.perPage}
           offset=${params.pagination?.page}
           ${field ? `order=${btoaURL(JSON.stringify([[field, order || "ASC"]]))}` : ""}
         `);
 
-        return { data: res.json, total: 11 };
+        console.log(res.data);
+
+        return { data: res.data, total: 11 };
       },
       getOne: async (resource, params) => {
-        const res = await authFetch(`
+        const res = await authFetch<any>(`
           http://localhost:3000/api/${resource}/${params.id}
         `);
 
-        return { data: res.json };
+        return { data: res.data };
       },
       update: async (resource, params) => {
-        const res = await authFetch(`http://localhost:3000/api/${resource}/${params.id}`, {
+        const res = await authFetch<any>(`http://localhost:3000/api/${resource}/${params.id}`, {
           method: "PUT",
           body: JSON.stringify(params.data),
         });
 
-        return { data: res.json };
+        return { data: res.data };
       },
 
       getMany: async (resource, params) => {
         const idsArr = params.ids.map((id) => JSON.stringify([resource, "=", id]));
         if (!idsArr.length) return { data: [] };
 
-        const res = await authFetch(`
+        const res = await authFetch<any>(`
           http://localhost:3000/api/${resource}?
           filter=${btoaURL(JSON.stringify(idsArr))}&nopages=1
         `);
 
-        return { data: res.json };
+        return { data: res.data };
       },
 
       getManyReference: async (resource, params) => {
@@ -56,7 +57,7 @@ export const useDataProvider = (): DataProvider => {
         // params.
         // const filter = params.ids.map((id) => JSON.stringify([resource, "=", id]));
 
-        const res = await authFetch(`
+        const res = await authFetch<any>(`
           http://localhost:3000/api/${resource}?
           limit=${params.pagination?.perPage}
           offset=${params.pagination?.page}
@@ -64,33 +65,41 @@ export const useDataProvider = (): DataProvider => {
           filter=${btoaURL(JSON.stringify([params.target, "=", params.id]))}
         `);
 
-        return { data: res.json, total: 100 };
+        return { data: res.data, total: 100 };
       },
 
       create: async (resource, params) => {
-        const res = await authFetch(`http://localhost:3000/api/${resource}`, {
+        const res = await authFetch<any>(`http://localhost:3000/api/${resource}`, {
           method: "POST",
           body: JSON.stringify(params.data),
         });
 
-        return { data: res.json };
+        return { data: res.data };
       },
 
       delete: async (resource, params) => {
-        const res = await authFetch(`http://localhost:3000/api/${resource}?id=${params.id}`, {
+        const res = await authFetch<any>(`http://localhost:3000/api/${resource}?id=${params.id}`, {
           method: "DELETE",
         });
 
-        return { data: res.json };
+        return { data: res.data };
       },
 
       deleteMany: async (resource, params) => {
-        const res = await authFetch(`
+        const res = await authFetch<any>(`
           http://localhost:3000/api/${resource}?
           ${params.ids.map((id) => `&id=${id}`)}
         `);
 
-        return { data: res.json };
+        return { data: res.data };
+      },
+
+      updateMany: async (resource, params) => {
+        const res = await authFetch<any>(`http://localhost:3000/api/${resource}`, {
+          method: "PUT",
+          body: JSON.stringify(params.data),
+        });
+        return { data: res.data };
       },
 
       // // update a record based on a patch
