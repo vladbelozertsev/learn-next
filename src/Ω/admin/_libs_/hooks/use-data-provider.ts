@@ -11,18 +11,20 @@ export const useDataProvider = (): DataProvider => {
   return useMemo(
     () => ({
       getList: async (resource, params) => {
+        const { page, perPage } = params.pagination || {};
         const { field, order } = params.sort || {};
 
-        const res = await authFetch<any>(`
-          http://localhost:3000/api/${resource}?
-          limit=${params.pagination?.perPage}
-          offset=${params.pagination?.page}
-          ${field ? `order=${btoaURL(JSON.stringify([[field, order || "ASC"]]))}` : ""}
-        `);
+        const res = await authFetch<any>(
+          `http://localhost:3000/api/${resource}?${new URLSearchParams({
+            limit: (perPage || 10) + "",
+            offset: (((page || 1) - 1) * (perPage || 10) || "") + "",
+            order: btoaURL(JSON.stringify([[field, order || "ASC"]])),
+            count: "1",
+          })}`
+        );
 
-        console.log(res.data);
-
-        return { data: res.data, total: 11 };
+        const total = +(res.res.headers.get("X-Count") || 0);
+        return { data: res.data, total };
       },
       getOne: async (resource, params) => {
         const res = await authFetch<any>(`
