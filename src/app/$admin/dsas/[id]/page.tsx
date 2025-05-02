@@ -1,14 +1,17 @@
 "use client";
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import { Img } from "../_libs_/components/img";
-import { List } from "@mui/material";
-import { sxPointer } from "../_libs_/utils";
+import { Img } from "../../_libs_/components/img";
 import { useDataGrid } from "@refinedev/mui";
-import { useGridGo } from "../_libs_/hooks/use-grid-go";
-import { useRouter } from "next/navigation";
+import { useShow } from "@refinedev/core";
 
-const columns: GridColDef<any>[] = [
+interface IProduct {
+  id: string;
+  name: string;
+  price: number;
+}
+
+const columns: GridColDef<IProduct>[] = [
   {
     field: "id",
     headerName: "№",
@@ -39,16 +42,17 @@ const columns: GridColDef<any>[] = [
   },
 ];
 
-export default function FlowersList() {
-  const show = useGridGo("show", "flowers");
-  const data = useDataGrid<any>();
-  const router = useRouter();
+export default function FlowerShow() {
+  const { query } = useShow<IProduct>();
+
+  console.log(query);
 
   return (
-    <List>
-      <button onClick={() => router.push("/$admin/flowers/create")}>crera</button>
-      <DataGrid {...data.dataGridProps} columns={columns} onRowClick={show} rowHeight={145} sx={sxPointer} />
-    </List>
+    <div>
+      <div>{query.data?.data?.id}</div>
+      <div>{query.data?.data?.name}</div>
+      <div>{query.data?.data?.price}</div>
+    </div>
   );
 }
 

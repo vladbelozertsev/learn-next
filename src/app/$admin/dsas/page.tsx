@@ -5,8 +5,7 @@ import { Img } from "../_libs_/components/img";
 import { List } from "@mui/material";
 import { sxPointer } from "../_libs_/utils";
 import { useDataGrid } from "@refinedev/mui";
-import { useGridGo } from "../_libs_/hooks/use-grid-go";
-import { useRouter } from "next/navigation";
+import { useGo } from "@refinedev/core";
 
 const columns: GridColDef<any>[] = [
   {
@@ -40,14 +39,23 @@ const columns: GridColDef<any>[] = [
 ];
 
 export default function FlowersList() {
-  const show = useGridGo("show", "flowers");
   const data = useDataGrid<any>();
-  const router = useRouter();
+  const go = useGo();
+
+  const showFlower = (id: string | number) => {
+    go({ to: { resource: "flowers", action: "show", id } });
+  };
 
   return (
     <List>
-      <button onClick={() => router.push("/$admin/flowers/create")}>crera</button>
-      <DataGrid {...data.dataGridProps} columns={columns} onRowClick={show} rowHeight={145} sx={sxPointer} />
+      <div>asdasdas</div>
+      <DataGrid
+        {...data.dataGridProps}
+        columns={columns}
+        onRowClick={(e) => showFlower(e.id)}
+        rowHeight={145}
+        sx={sxPointer}
+      />
     </List>
   );
 }

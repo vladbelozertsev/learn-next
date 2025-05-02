@@ -1,33 +1,23 @@
 "use client";
 
-import CssBaseline from "@mui/material/CssBaseline";
-import GlobalStyles from "@mui/material/GlobalStyles";
-import routerProvider from "@refinedev/nextjs-router";
-import { Refine, ResourceProps } from "@refinedev/core";
-import { RefineSnackbarProvider, RefineThemes, ThemedLayoutV2 } from "@refinedev/mui";
-import { ThemeProvider } from "@mui/material/styles";
+import type { RefineMUIProps } from "./_libs_/components/refine-mui";
+import type { ResourceProps } from "@refinedev/core";
+import dynamic from "next/dynamic";
 import { isAuthAtom } from "@/libs/state/auth";
+import { notFound } from "next/navigation";
 import { useAtom } from "jotai";
-import { useDataProvider } from "./_libs_/hooks/use-data-provider";
 
 const resources: ResourceProps[] = [
-  { name: "products", list: "/$admin/products" },
-  { name: "flowers", list: "/$admin/flowers" },
+  { name: "flowers", list: "/$admin/flowers", show: "/$admin/flowers/:id", create: "/$admin/flowers/add" },
+  { name: "dsas", list: "/$admin/dsas", show: "/$admin/dsas/:id", create: "/$admin/dsas/create" },
 ];
 
-export default function AdminLayout(props: { children: React.ReactNode }) {
-  const isAuth = useAtom(isAuthAtom)[0];
-  const dataProvider = useDataProvider();
+const RefineMUI = dynamic<RefineMUIProps>(() => import("./_libs_/components/refine-mui").then((mod) => mod.RefineMUI), {
+  ssr: true,
+});
 
-  return (
-    <ThemeProvider theme={RefineThemes.Blue}>
-      <CssBaseline />
-      <GlobalStyles styles={{ html: { WebkitFontSmoothing: "auto" } }} />
-      <RefineSnackbarProvider>
-        <Refine routerProvider={routerProvider} dataProvider={dataProvider} resources={resources}>
-          <ThemedLayoutV2>{props.children}</ThemedLayoutV2>
-        </Refine>
-      </RefineSnackbarProvider>
-    </ThemeProvider>
-  );
+export default function AdminLayout(props: { children: React.ReactNode }) {
+  const isAuth = useAtom(isAuthAtom)[0] || true;
+  if (!isAuth) return notFound();
+  return <RefineMUI resources={resources}>{props.children}</RefineMUI>;
 }

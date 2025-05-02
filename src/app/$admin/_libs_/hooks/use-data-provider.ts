@@ -7,6 +7,24 @@ import { useMemo } from "react";
 
 const url = "http://localhost:3000/api";
 
+// https://refine.dev/docs/advanced-tutorials/data-provider/handling-filters/#crudfilters
+const operators: { [key: string]: string } = {
+  eq: "=",
+  ne: "<>",
+  lt: "<",
+  gt: ">",
+  lte: "<=",
+  gte: ">=",
+  in: "IN",
+  nin: "NOT_IN",
+  between: "BTW",
+  nbetween: "NOT_BTW",
+  startswith: "LIKE",
+  nstartswith: "NOT_LIKE",
+  endswith: "LIKE",
+  nendswith: "NOT_LIKE",
+};
+
 export const useDataProvider = (): DataProvider => {
   const authFetch = useAuthFetch();
 
@@ -17,14 +35,15 @@ export const useDataProvider = (): DataProvider => {
       getList: async (params) => {
         const { current, pageSize } = params.pagination || {};
         const sort = (params.sorters || []).map((el) => [el.field, el.order.toUpperCase()]);
-
-        console.log(params.resource);
+        const filterFiltered = params.filters?.filter((f) => operators[f.operator] && f.field);
+        const filter = filterFiltered?.map((f) => [f.field, operators[f.operator], f.value]);
 
         const res = await authFetch<any>(
           `${url}/${params.resource}?${new URLSearchParams({
             limit: (pageSize || 10) + "",
             offset: (((current || 1) - 1) * (pageSize || 10) || "") + "",
             order: btoaURL(JSON.stringify(sort)),
+            filter: btoaURL(JSON.stringify(filter)),
             count: "1",
           })}`
         );
@@ -59,6 +78,7 @@ export const useDataProvider = (): DataProvider => {
       },
 
       create: async ({ resource, variables }) => {
+        console.log("asasddddcreate");
         const res = await authFetch<any>(`http://localhost:3000/api/${resource}`, {
           method: "POST",
           body: JSON.stringify(variables),

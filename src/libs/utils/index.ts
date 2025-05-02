@@ -58,3 +58,5 @@ export const camelize = (s?: string) => {
   if (!s || typeof s !== "string") return "";
   return s.replace(/-./g, (x) => x[1].toUpperCase());
 };
+
+export const tw = (tailwindClasses: string) => tailwindClasses;

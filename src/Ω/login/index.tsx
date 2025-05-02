@@ -1,7 +1,10 @@
 "use client";
 
+import ExampleToast from "@/libs/components/toast";
 import { FC } from "react";
 import { Input } from "@/libs/components/input";
+import { Popover } from "@/libs/components/popover";
+import { Toast } from "./toast";
 import { className } from "@/libs/helpers";
 import { useForm } from "react-hook-form";
 import { useLogin, useLoginGoogle } from "./api";
@@ -31,17 +34,9 @@ export const Login: FC = () => {
     <div {...styles.root}>
       <div {...styles.cont}>
         <h1 {...styles.h1}>Login</h1>
-        <Input
-          $top="Email"
-          $div="mb-5"
-          $err={form.formState.errors.email}
-          {...form.register("email")}
-        />
-        <Input
-          $top="Password"
-          $err={form.formState.errors.password}
-          {...form.register("password")}
-        />
+        <Toast />
+        <Input $top="Email" $div="mb-5" $err={form.formState.errors.email} {...form.register("email")} />
+        <Input $top="Password" $err={form.formState.errors.password} {...form.register("password")} />
         {login.isPending && "...loading"}
         <button onClick={signin}>submit</button>
       </div>
