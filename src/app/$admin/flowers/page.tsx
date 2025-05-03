@@ -2,7 +2,7 @@
 
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { Img } from "../_libs_/components/img";
-import { List } from "@mui/material";
+import { List } from "@refinedev/mui";
 import { sxPointer } from "../_libs_/utils";
 import { useDataGrid } from "@refinedev/mui";
 import { useGridGo } from "../_libs_/hooks/use-grid-go";
@@ -45,8 +45,7 @@ export default function FlowersList() {
   const router = useRouter();
 
   return (
-    <List>
-      <button onClick={() => router.push("/$admin/flowers/create")}>crera</button>
+    <List createButtonProps={{ onClick: () => router.push("/$admin/flowers/add") }}>
       <DataGrid {...data.dataGridProps} columns={columns} onRowClick={show} rowHeight={145} sx={sxPointer} />
     </List>
   );

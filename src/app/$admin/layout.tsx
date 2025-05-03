@@ -9,11 +9,13 @@ import { useAtom } from "jotai";
 
 const resources: ResourceProps[] = [
   { name: "flowers", list: "/$admin/flowers", show: "/$admin/flowers/:id", create: "/$admin/flowers/add" },
+  { name: "flowers varieties", list: "/$admin/flowers", show: "/$admin/flowers/:id", create: "/$admin/flowers/add" },
+  { name: "aaaa", list: "/$admin/dsas", show: "/$admin/dsas/:id", create: "/$admin/dsas/create" },
   { name: "dsas", list: "/$admin/dsas", show: "/$admin/dsas/:id", create: "/$admin/dsas/create" },
 ];
 
 const RefineMUI = dynamic<RefineMUIProps>(() => import("./_libs_/components/refine-mui").then((mod) => mod.RefineMUI), {
-  ssr: true,
+  ssr: false,
 });
 
 export default function AdminLayout(props: { children: React.ReactNode }) {
