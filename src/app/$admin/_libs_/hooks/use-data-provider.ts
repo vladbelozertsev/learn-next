@@ -20,6 +20,8 @@ export const useDataProvider = (): DataProvider => {
         const filterFiltered = params.filters?.filter((f) => "field" in f) as LogicalFilter[];
         const filter = filterFiltered?.map((f) => [f.field, f.operator, f.value]);
 
+        console.log("params.dataProviderName", params.dataProviderName);
+
         const res = await authFetch<any>(
           `${url}/${params.resource}?${new URLSearchParams({
             limit: (pageSize || 10) + "",
