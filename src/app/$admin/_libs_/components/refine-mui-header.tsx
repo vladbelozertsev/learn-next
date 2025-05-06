@@ -1,3 +1,5 @@
+"use client";
+
 import DarkModeIcon from "@mui/icons-material/DarkMode";
 import LightModeIcon from "@mui/icons-material/LightMode";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
@@ -7,8 +9,8 @@ import { Dispatch, FC, SetStateAction, useState } from "react";
 import { HamburgerMenu } from "@refinedev/mui";
 
 type Props = {
-  darkMode?: boolean;
-  setDarkMode: Dispatch<SetStateAction<boolean>>;
+  theme?: string | undefined;
+  setTheme: Dispatch<SetStateAction<string | undefined>>;
 };
 
 export const RefineMUIHeader: FC<Props> = (props) => {
@@ -20,7 +22,11 @@ export const RefineMUIHeader: FC<Props> = (props) => {
   };
 
   const toggleDarkMode = () => {
-    props.setDarkMode((dm) => !dm);
+    props.setTheme((theme) => {
+      const toggled = theme === "light" ? "dark" : "light";
+      localStorage.setItem("adminTheme", toggled);
+      return toggled;
+    });
     handleClose();
   };
 
@@ -53,10 +59,10 @@ export const RefineMUIHeader: FC<Props> = (props) => {
           transformOrigin={{ vertical: "top", horizontal: "right" }}
         >
           <MenuItem onClick={toggleDarkMode} disableRipple>
-            {props.darkMode && <LightModeIcon />}
-            {props.darkMode && "Light Mode"}
-            {!props.darkMode && <DarkModeIcon />}
-            {!props.darkMode && "Dark Mode"}
+            {props.theme === "dark" && <LightModeIcon />}
+            {props.theme === "dark" && "Light Mode"}
+            {props.theme === "light" && <DarkModeIcon />}
+            {props.theme === "light" && "Dark Mode"}
           </MenuItem>
           <Divider sx={{ my: 0.5 }} />
           <MenuItem onClick={handleClose} disableRipple>

@@ -10,8 +10,8 @@ export const useAuthFetch = () => {
     async <T>(input: string | URL | globalThis.Request, init?: RequestInit): Promise<{ data?: T; res: Response }> => {
       const handleRes = async (res: Response) => {
         if (res.ok) {
-          const json = await res.json();
-          return { data: json?.data || undefined, res, err: null };
+          const json = await res.json().then((r) => r?.data || r);
+          return { data: json?.data || json || undefined, res, err: null };
         }
 
         return res.text().then((err?: unknown) => {

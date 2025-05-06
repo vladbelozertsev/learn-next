@@ -9,22 +9,19 @@ import { useAtom } from "jotai";
 
 const resources: ResourceProps[] = [
   { name: "flowers" },
-  { name: "flowers2", meta: { parent: "flowers" } },
   {
     name: "flowers",
     list: "/$admin/flowers",
     show: "/$admin/flowers/:id",
     create: "/$admin/flowers/add",
-    meta: { parent: "flowers2" },
+    meta: { parent: "flowers" },
   },
   {
     name: "flowers/varieties",
-    identifier: "asasa",
-    clone: "sdsdsds",
-    list: "/$admin/flowers-varieties",
-    show: "/$admin/flowers-varieties/:id",
-    create: "/$admin/flowers-varieties/add",
-    meta: { parent: "flowers2" },
+    list: "/$admin/flowers/varieties",
+    show: "/$admin/flowers/varieties/:id",
+    create: "/$admin/flowers/varieties/add",
+    meta: { parent: "flowers" },
   },
 ];
 

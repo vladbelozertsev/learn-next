@@ -6,8 +6,10 @@ import { Input } from "@/libs/components/input";
 import { Popover } from "@/libs/components/popover";
 import { Toast } from "./toast";
 import { className } from "@/libs/helpers";
+import { useAuthFetch } from "@/libs/hooks/use-auth-fetch";
 import { useForm } from "react-hook-form";
 import { useLogin, useLoginGoogle } from "./api";
+import { useQuery } from "@tanstack/react-query";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -20,6 +22,7 @@ export const Login: FC = () => {
   const form = useForm({ resolver: zodResolver(schema) });
   const loginGoogle = useLoginGoogle();
   const login = useLogin();
+  const authFetch = useAuthFetch();
 
   const signin = form.handleSubmit(
     () => {
@@ -29,6 +32,19 @@ export const Login: FC = () => {
       console.error(err);
     }
   );
+
+  const varieties = useQuery({
+    queryKey: ["admin", "flowers/varieties", "nopages=1"],
+    queryFn: async () => {
+      const res = await authFetch(`http://localhost:3000/api/flowers/varieties?nopages=1`);
+      console.log("res - ", res, !!window);
+      return { data: res.data };
+    },
+  });
+
+  console.log(varieties.data);
+
+  if (varieties.data) return <div>asdadasd {JSON.stringify(varieties.data)}</div>;
 
   return (
     <div {...styles.root}>
